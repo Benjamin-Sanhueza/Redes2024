@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    build: 
+      context: ./postgresql
+      dockerfile: Dockerfile
+    container_name: proyecto_postgres
+    environment:
+      POSTGRES_USER: pi_user
+      POSTGRES_PASSWORD: tu_contraseña
+      POSTGRES_DB: proyecto_wifi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  python_app:
+    build:
+      context: ./python_app
+      dockerfile: Dockerfile
+    container_name: proyecto_python
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=pi_user
+      - DB_PASSWORD=tu_contraseña
+      - DB_NAME=proyecto_wifi_db
+    depends_on:
+      - postgres
+    volumes:
+      - ./python_app:/app
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
